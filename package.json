@@ -1,6 +1,6 @@
 {
     "name": "@quenk/safe-mongodb",
-    "version": "0.0.1",
+    "version": "0.1.0",
     "dependencies": {
         "@quenk/noni": "^1.26.0",
         "mongodb": "^3.2.7"
