@@ -15,8 +15,9 @@ docs: lib
 	./node_modules/.bin/typedoc \
 	--mode modules \
 	--out $@ \
-	--tsconfig lib/tsconfig.json \
-	--theme minimal lib  \
+	--tsconfig src/tsconfig.json \
+	--theme minimal \
+	--exclude node_modules\
 	--excludeNotExported \
 	--excludePrivate && \
 	echo "" > docs/.nojekyll

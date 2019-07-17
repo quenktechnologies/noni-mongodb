@@ -7,6 +7,6 @@
     },
     "devDependencies": {
         "@types/mongodb": "^3.1.28",
-        "typedoc": "^0.14.2"
+        "typedoc": "^0.13.0"
     }
 }
