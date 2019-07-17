@@ -1,0 +1,12 @@
+{
+    "name": "@quenk/safe-mongodb",
+    "version": "0.0.1",
+    "dependencies": {
+        "@quenk/noni": "^1.26.0",
+        "mongodb": "^3.2.7"
+    },
+    "devDependencies": {
+        "@types/mongodb": "^3.1.28",
+        "typedoc": "^0.14.2"
+    }
+}
