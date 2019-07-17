@@ -168,7 +168,7 @@ export const populate =
 
         if (mData.isNothing()) return pure(mData);
 
-        let data = mData.get();
+        let data = <Object>mData.get();
 
         return findOne(c, { [ref[1]]: data[ref[0]] }, { fields })
             .chain(mr => {
@@ -176,7 +176,7 @@ export const populate =
                 if (mr.isJust())
                     data[ref[0]] = <Object>mr.get();
 
-                return pure(just(data));
+                return pure(just(<T>data));
 
             });
 
