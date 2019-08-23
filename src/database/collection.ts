@@ -175,6 +175,8 @@ export const populate =
 
                 if (mr.isJust())
                     data[ref[0]] = <Object>mr.get();
+                else
+                    delete data[ref[0]];
 
                 return pure(just(<T>data));
 
