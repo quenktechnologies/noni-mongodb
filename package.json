@@ -3,15 +3,16 @@
     "version": "0.1.2",
     "description": "Type safe wrappers for the mongodb driver.",
     "dependencies": {
-        "@quenk/noni": "^1.26.0",
-        "mongodb": "^3.2.7"
+        "@quenk/noni": "^1.33.0",
+        "mongodb": "^3.3.2"
     },
     "devDependencies": {
-        "@quenk/test": "^2.1.1",
+        "@quenk/test": "^2.1.2",
         "@types/mocha": "^5.2.7",
-        "@types/mongodb": "^3.1.28",
-        "mocha": "^6.2.0",
-        "ts-node": "^8.3.0",
-        "typedoc": "^0.13.0"
+        "@types/mongodb": "^3.3.5",
+        "mocha": "^6.2.1",
+        "ts-node": "^8.4.1",
+        "typedoc": "^0.13.0",
+        "typescript": "^3.6.3"
     }
 }

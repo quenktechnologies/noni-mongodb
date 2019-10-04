@@ -10,11 +10,11 @@ export declare type Collection = mongo.Collection;
 /**
  * InsertOneResult type.
  */
-export declare type InsertOneResult = mongo.InsertOneWriteOpResult;
+export declare type InsertOneResult = mongo.InsertOneWriteOpResult<object>;
 /**
  * InsertResult type.
  */
-export declare type InsertResult = mongo.InsertWriteOpResult;
+export declare type InsertResult = mongo.InsertWriteOpResult<object>;
 /**
  * FindResult type.
  */
@@ -46,11 +46,11 @@ export declare type ForeignKey = string;
 /**
  * insertOne document into a collection.
  */
-export declare const insertOne: (c: mongo.Collection<any>, doc: object, opts?: object) => Future<mongo.InsertOneWriteOpResult>;
+export declare const insertOne: (c: mongo.Collection<any>, doc: object, opts?: object) => Future<mongo.InsertOneWriteOpResult<object>>;
 /**
  * insertMany documents into a collection.
  */
-export declare const insertMany: (c: mongo.Collection<any>, docs: object[], opts?: object) => Future<mongo.InsertWriteOpResult>;
+export declare const insertMany: (c: mongo.Collection<any>, docs: object[], opts?: object) => Future<mongo.InsertWriteOpResult<object>>;
 /**
  * findOne doument in a collection.
  */

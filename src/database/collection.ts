@@ -27,12 +27,12 @@ export type Collection = mongo.Collection;
 /**
  * InsertOneResult type.
  */
-export type InsertOneResult = mongo.InsertOneWriteOpResult;
+export type InsertOneResult = mongo.InsertOneWriteOpResult<object>;
 
 /**
  * InsertResult type.
  */
-export type InsertResult = mongo.InsertWriteOpResult;
+export type InsertResult = mongo.InsertWriteOpResult<object>;
 
 /**
  * FindResult type.
