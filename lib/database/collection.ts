@@ -170,17 +170,35 @@ export const populate =
 
         let data = <Object>mData.get();
 
-        return findOne(c, { [ref[1]]: data[ref[0]] }, { fields })
-            .chain(mr => {
+        if (Array.isArray(data[ref[0]])) {
 
-                if (mr.isJust())
-                    data[ref[0]] = <Object>mr.get();
-                else
-                    delete data[ref[0]];
+            return find(c, { [ref[1]]: { $in: data[ref[0]] } }, { fields })
+                .chain(mr => {
 
-                return pure(just(<T>data));
+                    if (mr.isJust())
+                        data[ref[0]] = <Object[]>mr.get();
+                    else
+                        delete data[ref[0]];
 
-            });
+                    return pure(just(<T>data));
+
+                });
+
+        } else {
+
+            return findOne(c, { [ref[1]]: data[ref[0]] }, { fields })
+                .chain(mr => {
+
+                    if (mr.isJust())
+                        data[ref[0]] = <Object>mr.get();
+                    else
+                        delete data[ref[0]];
+
+                    return pure(just(<T>data));
+
+                });
+
+        }
 
     }
 

@@ -1,19 +1,44 @@
 import { assert } from '@quenk/test/lib/assert';
-import { toPromise, Future, attempt } from '@quenk/noni/lib/control/monad/future';
+import { toPromise, Future, attempt, pure } from '@quenk/noni/lib/control/monad/future';
 import { doN, DoFn } from '@quenk/noni/lib/control/monad';
 import { connect, disconnect } from '../../lib/client';
+import {
+    insertOne,
+    findOne,
+    populate,
+    insertMany,
+    find,
+    populateN,
+} from '../../lib/database/collection';
 import { drop } from '../../lib/database';
-import { insertOne, findOne, populate, insertMany, find, populateN } from '../../lib/database/collection';
 
 const URL = 'mongodb://localhost/safe-mongo-test';
 
 describe('collection', () => {
 
+    let mClient: any = null;
+
+    let db: any = null;
+
+    before(() => toPromise(doN(<DoFn<undefined, Future<undefined>>>function*() {
+
+        mClient = yield connect(URL);
+
+        return pure(undefined);
+
+    })));
+
+    beforeEach(() => {
+
+        db = mClient.db();
+
+    });
+
+    afterEach(() => toPromise(drop(db)));
+
+    after(() => toPromise(disconnect(mClient)));
+
     describe('populate', () => {
-
-        let mClient: any = null;
-
-        after(() => toPromise(disconnect(mClient)));
 
         it('should populate a record', () =>
             toPromise(doN(<DoFn<undefined, Future<undefined>>>function*() {
@@ -21,10 +46,6 @@ describe('collection', () => {
                 let sale = { id: 1000, client: 1, item: 'Shoes' };
 
                 let client = { id: 1, name: 'Larry' };
-
-                mClient = yield connect(URL);
-
-                let db = mClient.db();
 
                 let sales = db.collection('sales');
 
@@ -53,17 +74,64 @@ describe('collection', () => {
 
                 }));
 
-                return drop(db);
+                return pure(undefined);
 
             })))
+
+        it('should populate an array', () =>
+            toPromise(doN(<DoFn<undefined, Future<undefined>>>function*() {
+
+                let sale0 = { id: 100, item: 'Shoes' };
+                let sale1 = { id: 1000, item: 'Hands' };
+                let sale2 = { id: 2000, item: 'Feet' };
+                let sale3 = { id: 3000, item: 'Toes' };
+
+                let client = { id: 1, name: 'Kule', sales: [100, 1000, 3000] };
+
+                let sales = db.collection('sales');
+
+                let clients = db.collection('clients');
+
+                yield insertOne(sales, sale0);
+                yield insertOne(sales, sale1);
+                yield insertOne(sales, sale2);
+                yield insertOne(sales, sale3);
+
+                yield insertOne(clients, client);
+
+                let mCli = yield findOne(clients, { id: 1 });
+
+                let mPopClient = yield populate(sales, ['sales', 'id'], mCli,
+                    { id: 1, item: 1 });
+
+                let target = yield attempt(() => mPopClient.get());
+
+                delete target._id;
+
+                yield attempt(() => assert(target).equate({
+
+                    id: 1,
+
+                    name: 'Kule',
+
+                    sales: [
+
+                        { id: 100, item: 'Shoes' },
+                        { id: 1000, item: 'Hands' },
+                        { id: 3000, item: 'Toes' }
+
+                    ]
+
+                }));
+
+                return pure(undefined);
+
+            })))
+
 
     });
 
     describe('populateN', () => {
-
-        let mClient: any = null;
-
-        after(() => toPromise(disconnect(mClient)));
 
         it('should populate a record', () =>
             toPromise(doN(<DoFn<undefined, Future<undefined>>>function*() {
@@ -81,8 +149,6 @@ describe('collection', () => {
                 let client1 = { id: 2, name: 'Harry' };
 
                 let client2 = { id: 3, name: 'Barry' };
-
-                mClient = yield connect(URL);
 
                 let db = mClient.db();
 
@@ -143,11 +209,10 @@ describe('collection', () => {
 
                 }));
 
-                return drop(db);
+                return pure(undefined);
 
             })))
 
     })
 
 })
-
