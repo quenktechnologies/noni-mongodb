@@ -10,11 +10,15 @@ export declare type Collection = mongo.Collection;
 /**
  * InsertOneResult type.
  */
-export declare type InsertOneResult = mongo.InsertOneWriteOpResult<object>;
+export declare type InsertOneResult = mongo.InsertOneWriteOpResult<{
+    _id: object;
+}>;
 /**
  * InsertResult type.
  */
-export declare type InsertResult = mongo.InsertWriteOpResult<object>;
+export declare type InsertResult = mongo.InsertWriteOpResult<{
+    _id: object;
+}>;
 /**
  * FindResult type.
  */
@@ -46,23 +50,23 @@ export declare type ForeignKey = string;
 /**
  * insertOne document into a collection.
  */
-export declare const insertOne: (c: mongo.Collection<any>, doc: object, opts?: object) => Future<mongo.InsertOneWriteOpResult<object>>;
+export declare const insertOne: (c: Collection, doc: object, opts?: object) => Future<InsertOneResult>;
 /**
  * insertMany documents into a collection.
  */
-export declare const insertMany: (c: mongo.Collection<any>, docs: object[], opts?: object) => Future<mongo.InsertWriteOpResult<object>>;
+export declare const insertMany: (c: Collection, docs: object[], opts?: object) => Future<InsertResult>;
 /**
  * findOne doument in a collection.
  */
-export declare const findOne: <T>(c: mongo.Collection<any>, qry: object, opts?: object) => Future<Maybe<T>>;
+export declare const findOne: <T>(c: Collection, qry: object, opts?: object) => Future<FindResult<T>>;
 /**
  * find documents in a collection.
  */
-export declare const find: <T>(c: mongo.Collection<any>, qry: object, opts?: object) => Future<Maybe<T[]>>;
+export declare const find: <T>(c: Collection, qry: object, opts?: object) => Future<FindResult<T[]>>;
 /**
  * findOneAndUpdate a document in a collection.
  */
-export declare const findOneAndUpdate: <T>(c: mongo.Collection<any>, filter: object, update: object, opts?: object) => Future<Maybe<T>>;
+export declare const findOneAndUpdate: <T>(c: Collection, filter: object, update: object, opts?: object) => Future<FindResult<T>>;
 /**
  * count the number of documents in a collection that match a query.
  */
@@ -70,7 +74,7 @@ export declare const count: (c: mongo.Collection<any>, qry: object, opts?: objec
 /**
  * updateOne document in a collection.
  */
-export declare const updateOne: (c: mongo.Collection<any>, qry: object, changes: object, opts?: object) => Future<mongo.UpdateWriteOpResult>;
+export declare const updateOne: (c: Collection, qry: object, changes: object, opts?: object) => Future<mongo.UpdateWriteOpResult>;
 /**
  * deleteOne document in a collection.
  */
@@ -78,7 +82,7 @@ export declare const deleteOne: (c: mongo.Collection<any>, qry: object, opts?: o
 /**
  * aggregate applies an aggregation pipeline to a collection
  */
-export declare const aggregate: <T>(c: mongo.Collection<any>, p: object[], opts?: object) => Future<Maybe<T[]>>;
+export declare const aggregate: <T>(c: Collection, p: object[], opts?: object) => Future<FindResult<T[]>>;
 /**
  * populate is a helper function for "linking" data nested in a
  * document.
@@ -86,11 +90,11 @@ export declare const aggregate: <T>(c: mongo.Collection<any>, p: object[], opts?
  * It works by replacing the occurence of a target key with a document
  * in another collection using the target key's value as the _id reference.
  */
-export declare const populate: <T extends Object>(c: mongo.Collection<any>, ref: [string, string], mData: Maybe<T>, fields: object) => Future<Maybe<T>>;
+export declare const populate: <T extends Object>(c: mongo.Collection<any>, ref: LinkRef, mData: Maybe<T>, fields: object) => Future<Maybe<T>>;
 /**
  * populateN is like populate but works with multiple documents.
  *
  * It will apply populate for each document individually operating in batches
  * of 100 by default.
  */
-export declare const populateN: <T extends Object>(c: mongo.Collection<any>, refs: [string, string], data: Maybe<T[]>, fields: object, n?: number) => Future<Maybe<T[]>>;
+export declare const populateN: <T extends Object>(c: mongo.Collection<any>, refs: LinkRef, data: Maybe<T[]>, fields: object, n?: number) => Future<Maybe<T[]>>;
