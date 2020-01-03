@@ -98,3 +98,8 @@ export declare const populate: <T extends Object>(c: mongo.Collection<any>, ref:
  * of 100 by default.
  */
 export declare const populateN: <T extends Object>(c: mongo.Collection<any>, refs: LinkRef, data: Maybe<T[]>, fields: object, n?: number) => Future<Maybe<T[]>>;
+/**
+ * createIndexes can be used to create multiple indexes on a collection on
+ * version > 2.6
+ */
+export declare const createIndexes: (c: mongo.Collection<any>, specs: mongo.IndexSpecification[], opts?: object) => Future<object>;

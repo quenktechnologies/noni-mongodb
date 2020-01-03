@@ -232,3 +232,13 @@ export const populateN = <T extends Object>(
     }
 
 }
+
+/**
+ * createIndexes can be used to create multiple indexes on a collection on
+ * version > 2.6
+ */
+export const createIndexes = (
+    c: mongo.Collection,
+    specs: mongo.IndexSpecification[],
+    opts: object = {}) => fromCallback<object>(cb =>
+        c.createIndexes(specs, opts, cb));
