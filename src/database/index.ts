@@ -19,9 +19,9 @@ export const dropCollection = (db: Database, name: string): Future<boolean> =>
     fromCallback(cb => db.dropCollection(name, cb));
 
 /**
- * createIndexes can be used to create an indexes on a collection.
+ * createIndex can be used to create an indexes on a collection.
  */
-export const createIndexes = (
+export const createIndex = (
     c: Database,
     collection: string,
     specs: string | mongo.IndexSpecification,
