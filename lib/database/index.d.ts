@@ -15,4 +15,4 @@ export declare const dropCollection: (db: mongo.Db, name: string) => Future<bool
 /**
  * createIndex can be used to create an indexes on a collection.
  */
-export declare const createIndex: (c: mongo.Db, collection: string, specs: string | mongo.IndexSpecification, opts?: object) => Future<object>;
+export declare const createIndex: (c: mongo.Db, collection: string, specs: string | object, opts?: object) => Future<object>;

@@ -24,6 +24,6 @@ export const dropCollection = (db: Database, name: string): Future<boolean> =>
 export const createIndex = (
     c: Database,
     collection: string,
-    specs: string | mongo.IndexSpecification,
+    specs: string | object,
     opts: object = {}) => fromCallback<object>(cb =>
         c.createIndex(collection, specs, opts, cb));
