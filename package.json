@@ -1,6 +1,6 @@
 {
     "name": "@quenk/safe-mongodb",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "description": "Type safe wrappers for the mongodb driver.",
     "dependencies": {
         "@quenk/noni": "^1.35.1",
