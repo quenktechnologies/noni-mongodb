@@ -133,6 +133,19 @@ export const updateOne =
             c.updateOne(qry, { $set: changes }, opts, cb));
 
 /**
+ * updateMany documents in a collection.
+ */
+export const updateMany =
+    (
+        c: Collection,
+        qry: object,
+        changes: object,
+        opts: object = {})
+        : Future<UpdateResult> =>
+        fromCallback<UpdateResult>(cb =>
+            c.updateOne(qry, changes, opts, cb));
+
+/**
  * deleteOne document in a collection.
  */
 export const deleteOne = (c: mongo.Collection, qry: object, opts: object = {})

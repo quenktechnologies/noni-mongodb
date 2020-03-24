@@ -76,6 +76,10 @@ export declare const count: (c: mongo.Collection<any>, qry: object, opts?: objec
  */
 export declare const updateOne: (c: Collection, qry: object, changes: object, opts?: object) => Future<mongo.UpdateWriteOpResult>;
 /**
+ * updateMany documents in a collection.
+ */
+export declare const updateMany: (c: Collection, qry: object, changes: object, opts?: object) => Future<mongo.UpdateWriteOpResult>;
+/**
  * deleteOne document in a collection.
  */
 export declare const deleteOne: (c: mongo.Collection<any>, qry: object, opts?: object) => Future<mongo.DeleteWriteOpResultObject>;
