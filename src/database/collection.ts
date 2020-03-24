@@ -1,4 +1,5 @@
 import * as mongo from 'mongodb';
+
 import {
     Future,
     pure,
@@ -138,6 +139,15 @@ export const deleteOne = (c: mongo.Collection, qry: object, opts: object = {})
     : Future<mongo.DeleteWriteOpResultObject> =>
     fromCallback<mongo.DeleteWriteOpResultObject>(cb =>
         c.deleteOne(qry, opts, cb));
+
+/**
+ * deleteMany documents in a collection.
+ */
+export const deleteMany = (c: mongo.Collection, qry: object, opts: object = {})
+    : Future<mongo.DeleteWriteOpResultObject> =>
+    fromCallback<mongo.DeleteWriteOpResultObject>(cb =>
+        c.deleteMany(qry, opts, cb));
+
 /**
  * aggregate applies an aggregation pipeline to a collection
  */

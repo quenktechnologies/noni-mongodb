@@ -80,6 +80,10 @@ export declare const updateOne: (c: Collection, qry: object, changes: object, op
  */
 export declare const deleteOne: (c: mongo.Collection<any>, qry: object, opts?: object) => Future<mongo.DeleteWriteOpResultObject>;
 /**
+ * deleteMany documents in a collection.
+ */
+export declare const deleteMany: (c: mongo.Collection<any>, qry: object, opts?: object) => Future<mongo.DeleteWriteOpResultObject>;
+/**
  * aggregate applies an aggregation pipeline to a collection
  */
 export declare const aggregate: <T>(c: Collection, p: object[], opts?: object) => Future<FindResult<T[]>>;
