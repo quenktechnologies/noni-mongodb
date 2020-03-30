@@ -1,6 +1,6 @@
 {
     "name": "@quenk/safe-mongodb",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "description": "Type safe wrappers for the mongodb driver.",
     "files": [
         "lib"
