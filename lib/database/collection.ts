@@ -143,7 +143,7 @@ export const updateMany =
         opts: object = {})
         : Future<UpdateResult> =>
         fromCallback<UpdateResult>(cb =>
-            c.updateOne(qry, changes, opts, cb));
+            c.updateMany(qry, changes, opts, cb));
 
 /**
  * deleteOne document in a collection.
