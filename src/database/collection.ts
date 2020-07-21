@@ -4,16 +4,16 @@ import {
     Future,
     pure,
     fromCallback,
-    batch
+    batch,
+    doFuture
 } from '@quenk/noni/lib/control/monad/future';
 import { Object } from '@quenk/noni/lib/data/json';
-import { distribute } from '@quenk/noni/lib/data/array';
+import { distribute, empty } from '@quenk/noni/lib/data/array';
 import {
     Maybe,
     nothing,
     just,
-    fromNullable,
-    fromArray
+    fromNullable
 } from '@quenk/noni/lib/data/maybe';
 
 export { Maybe }
@@ -71,6 +71,11 @@ export type LocalKey = string;
 export type ForeignKey = string;
 
 /**
+ * AggregationCursor
+ */
+export type AggregationCursor<T> = mongo.AggregationCursor<T>;
+
+/**
  * insertOne document into a collection.
  */
 export const insertOne =
@@ -85,32 +90,31 @@ export const insertMany =
         fromCallback<InsertResult>(cb => c.insertMany(docs, opts, cb));
 
 /**
- * findOne doument in a collection.
+ * findOne document in a collection.
  */
 export const findOne = <T>(c: Collection, qry: object, opts: object = {})
-    : Future<FindResult<T>> =>
-    fromCallback<T | null | undefined>(cb => c.findOne(qry, opts, cb))
+    : Future<Maybe<T>> =>
+    fromCallback<T | null>(cb => c.findOne(qry, opts, cb))
         .map(r => fromNullable<T>(<T>r));
 
 /**
  * find documents in a collection.
  */
 export const find = <T>(c: Collection, qry: object, opts: object = {})
-    : Future<FindResult<T[]>> =>
+    : Future<T[]> =>
     fromCallback<T[]>(cb => c.find(qry, opts).toArray(cb))
-        .map(r => fromArray<T>(r));
 
 /**
  * findOneAndUpdate a document in a collection.
  */
-export const findOneAndUpdate =
-    <T>(c: Collection,
-        filter: object,
-        update: object,
-        opts: object = {}): Future<FindResult<T>> =>
-        fromCallback<mongo.FindAndModifyWriteOpResultObject<T>>(cb =>
-            c.findOneAndUpdate(filter, update, opts, cb))
-            .map(r => r.ok ? fromNullable<T>(r.value) : nothing());
+export const findOneAndUpdate = <T>(
+    c: Collection,
+    filter: object,
+    update: object,
+    opts: object = {}): Future<Maybe<T>> =>
+    fromCallback<mongo.FindAndModifyWriteOpResultObject<T>>(cb =>
+        c.findOneAndUpdate(filter, update, opts, cb))
+        .map(r => r.ok ? fromNullable<T>(r.value) : nothing());
 
 /**
  * count the number of documents in a collection that match a query.
@@ -121,56 +125,65 @@ export const count =
 
 /**
  * updateOne document in a collection.
+ *
+ * The updateSpec should correspond to any of the valid mongodb update 
+ * documents.
  */
-export const updateOne =
-    (
-        c: Collection,
-        qry: object,
-        changes: object,
-        opts: object = {})
-        : Future<UpdateResult> =>
-        fromCallback<UpdateResult>(cb =>
-            c.updateOne(qry, { $set: changes }, opts, cb));
+export const updateOne = (
+    c: Collection,
+    qry: object,
+    updateSpec: object,
+    opts: object = {}): Future<UpdateResult> =>
+    fromCallback<UpdateResult>(cb => c.updateOne(qry, updateSpec, opts, cb));
 
 /**
  * updateMany documents in a collection.
+ *
+ * The updateSpec should correspond to any of the valid mongodb update 
+ * documents.
  */
-export const updateMany =
-    (
-        c: Collection,
-        qry: object,
-        changes: object,
-        opts: object = {})
-        : Future<UpdateResult> =>
-        fromCallback<UpdateResult>(cb =>
-            c.updateMany(qry, changes, opts, cb));
+export const updateMany = (
+    c: Collection,
+    qry: object,
+    updateSpec: object,
+    opts: object = {}): Future<UpdateResult> =>
+    fromCallback<UpdateResult>(cb => c.updateMany(qry, updateSpec, opts, cb));
 
 /**
  * deleteOne document in a collection.
  */
-export const deleteOne = (c: mongo.Collection, qry: object, opts: object = {})
-    : Future<mongo.DeleteWriteOpResultObject> =>
-    fromCallback<mongo.DeleteWriteOpResultObject>(cb =>
-        c.deleteOne(qry, opts, cb));
+export const deleteOne = (
+    c: mongo.Collection,
+    qry: object,
+    opts: object = {}): Future<DeleteResult> =>
+    fromCallback<DeleteResult>(cb => c.deleteOne(qry, opts, cb));
 
 /**
  * deleteMany documents in a collection.
  */
-export const deleteMany = (c: mongo.Collection, qry: object, opts: object = {})
-    : Future<mongo.DeleteWriteOpResultObject> =>
-    fromCallback<mongo.DeleteWriteOpResultObject>(cb =>
-        c.deleteMany(qry, opts, cb));
+export const deleteMany = (
+    c: mongo.Collection,
+    qry: object,
+    opts: object = {}): Future<DeleteResult> =>
+    fromCallback<DeleteResult>(cb => c.deleteMany(qry, opts, cb));
 
 /**
  * aggregate applies an aggregation pipeline to a collection
  */
-export const aggregate = <T>(c: Collection, p: object[], opts: object = {})
-    : Future<FindResult<T[]>> =>
-    fromCallback<mongo.AggregationCursor<T>>(cb => c.aggregate(p, opts, cb))
-        .chain(cursor =>
-            fromCallback<T[]>(cb => cursor.toArray(cb))
-                .chain(data => fromCallback<ACR>(cb => cursor.close(cb))
-                    .map(() => fromArray(data))));
+export const aggregate = <T>(
+    c: Collection,
+    p: object[],
+    opts: object = {}): Future<T[]> => doFuture(function*() {
+
+        let cursor = yield fromCallback(cb => c.aggregate(p, opts, cb));
+
+        let data = yield fromCallback<T[]>(cb => cursor.toArray(cb));
+
+        yield fromCallback<ACR>(cb => cursor.close(cb));
+
+        return pure(data);
+
+    });
 
 /**
  * populate is a helper function for "linking" data nested in a 
@@ -198,8 +211,8 @@ export const populate =
             return find(c, { [ref[1]]: { $in: data[ref[0]] } }, { fields })
                 .chain(mr => {
 
-                    if (mr.isJust())
-                        data[ref[0]] = <Object[]>mr.get();
+                    if (!empty(mr))
+                        data[ref[0]] = <Object[]>mr;
                     else
                         data[ref[0]] = [];
 
@@ -234,19 +247,19 @@ export const populate =
 export const populateN = <T extends Object>(
     c: mongo.Collection,
     refs: LinkRef,
-    data: Maybe<T[]>,
+    data: T[],
     fields: object,
-    n = 100): Future<Maybe<T[]>> => {
+    n = 100): Future<T[]> => {
 
-    if (data.isJust()) {
+    if (!empty(data)) {
 
         let work =
-            data.get().map(r =>
+            data.map(r =>
                 populate(c, refs, just(r), fields)
                     .map(m => m.get()));
 
         return batch(distribute(work, n))
-            .map(r => fromArray(r.reduce((p, c) => p.concat(c), [])));
+            .map(r => r.reduce((p, c) => p.concat(c), []));
 
     } else {
 

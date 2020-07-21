@@ -163,9 +163,10 @@ describe('collection', () => {
                 let mSales = yield find(sales, {});
 
                 let mPopSales =
-                    yield populateN(clients, ['client', 'id'], mSales, { id: 1, name: 1 });
+                    yield populateN(clients, ['client', 'id'], mSales,
+                      { id: 1, name: 1 });
 
-                let targets = yield attempt(() => mPopSales.get());
+                let targets = mPopSales;
 
                 targets.forEach((t: { _id: string }) => delete t._id);
 
@@ -212,7 +213,5 @@ describe('collection', () => {
                 return pure(undefined);
 
             })))
-
     })
-
 })
