@@ -11,8 +11,8 @@ export declare type Options = mongo.MongoClientOptions;
 /**
  * connect to a MongoDB database using the driver as client.
  */
-export declare const connect: (url: string, opts?: mongo.MongoClientOptions) => Future<mongo.MongoClient>;
+export declare const connect: (url: string, opts?: Options) => Future<Client>;
 /**
  * disconnect a client from its MongoDB database.
  */
-export declare const disconnect: (c: mongo.MongoClient) => Future<void>;
+export declare const disconnect: (c: Client) => Future<void>;
