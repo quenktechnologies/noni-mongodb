@@ -208,7 +208,8 @@ export const populate =
 
         if (Array.isArray(data[ref[0]])) {
 
-            return find(c, { [ref[1]]: { $in: data[ref[0]] } }, { fields })
+            return find(c, { [ref[1]]: { $in: data[ref[0]] } },
+                { projection: fields })
                 .chain(mr => {
 
                     if (!empty(mr))
@@ -222,7 +223,8 @@ export const populate =
 
         } else {
 
-            return findOne(c, { [ref[1]]: data[ref[0]] }, { fields })
+            return findOne(c, { [ref[1]]: data[ref[0]] }, 
+              { projection: fields })
                 .chain(mr => {
 
                     if (mr.isJust())
