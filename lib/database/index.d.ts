@@ -13,6 +13,11 @@ export declare const drop: (db: Database) => Future<void>;
  */
 export declare const dropCollection: (db: Database, name: string) => Future<boolean>;
 /**
+ * collections provides a list of collection instances for each collection in
+ * the database.
+ */
+export declare const collections: (db: Database) => Future<mongo.Collection[]>;
+/**
  * createIndex can be used to create an indexes on a collection.
  */
 export declare const createIndex: (c: Database, collection: string, specs: string | object, opts?: object) => Future<object>;

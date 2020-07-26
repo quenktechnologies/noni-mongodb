@@ -19,6 +19,13 @@ export const dropCollection = (db: Database, name: string): Future<boolean> =>
     fromCallback(cb => db.dropCollection(name, cb));
 
 /**
+ * collections provides a list of collection instances for each collection in
+ * the database.
+ */
+export const collections = (db: Database): Future<mongo.Collection[]> =>
+    fromCallback(cb => db.collections( cb));
+
+/**
  * createIndex can be used to create an indexes on a collection.
  */
 export const createIndex = (
