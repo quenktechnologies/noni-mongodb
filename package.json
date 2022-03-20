@@ -9,13 +9,13 @@
     "lib"
   ],
   "dependencies": {
-    "@quenk/noni": "^1.40.14",
-    "mongodb": "^3.6.3"
+    "@quenk/noni": "^1.41.3",
+    "mongodb": "^4.4.1"
   },
   "devDependencies": {
     "@quenk/test": "^2.2.4",
     "@types/mocha": "^8.0.4",
-    "@types/mongodb": "^3.5.34",
+    "@types/mongodb": "^4.0.7",
     "mocha": "^8.2.1",
     "ts-node": "^9.0.0",
     "typedoc": "^0.19.2",
