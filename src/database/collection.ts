@@ -8,7 +8,7 @@ import {
     doFuture,
     liftP
 } from '@quenk/noni/lib/control/monad/future';
-import { Object } from '@quenk/noni/lib/data/json';
+import { Object } from '@quenk/noni/lib/data/jsonx';
 import { distribute, empty } from '@quenk/noni/lib/data/array';
 import {
     Maybe,
