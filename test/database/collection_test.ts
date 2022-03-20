@@ -1,4 +1,4 @@
-import { assert } from '@quenk/test/lib/assert';
+import { assert, Type } from '@quenk/test/lib/assert';
 import { toPromise, Future, attempt, pure } from '@quenk/noni/lib/control/monad/future';
 import { doN, DoFn } from '@quenk/noni/lib/control/monad';
 import { connect, disconnect } from '../../lib/client';
@@ -168,7 +168,7 @@ describe('collection', () => {
 
                 let targets = mPopSales;
 
-                targets.forEach((t: { _id: string }) => delete t._id);
+                targets.forEach((t: { _id: string }) => delete (<Type>t)._id);
 
                 yield attempt(() => assert(targets[0]).equate({
 

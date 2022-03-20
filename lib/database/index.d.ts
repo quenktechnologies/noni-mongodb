@@ -7,7 +7,7 @@ export declare type Database = mongo.Db;
 /**
  * drop the database reference supplied.
  */
-export declare const drop: (db: Database) => Future<void>;
+export declare const drop: (db: Database) => Future<boolean>;
 /**
  * dropColllection from the database reference supplied.
  */
@@ -20,4 +20,4 @@ export declare const collections: (db: Database) => Future<mongo.Collection[]>;
 /**
  * createIndex can be used to create an indexes on a collection.
  */
-export declare const createIndex: (c: Database, collection: string, specs: string | object, opts?: object) => Future<object>;
+export declare const createIndex: (db: mongo.Db, name: string, spec: mongo.IndexSpecification, opts?: mongo.CreateIndexesOptions) => Future<string>;

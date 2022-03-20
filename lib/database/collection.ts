@@ -5,9 +5,10 @@ import {
     pure,
     fromCallback,
     batch,
-    doFuture
+    doFuture,
+    liftP
 } from '@quenk/noni/lib/control/monad/future';
-import { Object } from '@quenk/noni/lib/data/json';
+import { Object } from '@quenk/noni/lib/data/jsonx';
 import { distribute, empty } from '@quenk/noni/lib/data/array';
 import {
     Maybe,
@@ -18,8 +19,6 @@ import {
 
 export { Maybe }
 
-type ACR = mongo.AggregationCursorResult;
-
 /**
  * Collection alias.
  */
@@ -28,12 +27,17 @@ export type Collection = mongo.Collection;
 /**
  * InsertOneResult type.
  */
-export type InsertOneResult = mongo.InsertOneWriteOpResult<{ _id: object }>;
+export type InsertOneResult = mongo.InsertOneResult<{ _id: object }>;
 
 /**
  * InsertResult type.
  */
-export type InsertResult = mongo.InsertWriteOpResult<{ _id: object }>;
+export type InsertResult = mongo.InsertOneResult<{ _id: object }>;
+
+/**
+ * InsertManyResult type.
+ */
+export type InsertManyResult = mongo.InsertManyResult;
 
 /**
  * FindResult type.
@@ -48,12 +52,12 @@ export type Count = number;
 /**
  * UpdateResult type.
  */
-export type UpdateResult = mongo.UpdateWriteOpResult;
+export type UpdateResult = mongo.UpdateResult;
 
 /**
  * DeleteResult type.
  */
-export type DeleteResult = mongo.DeleteWriteOpResultObject;
+export type DeleteResult = mongo.DeleteResult;
 
 /**
  * LinkRef type used in population.
@@ -79,49 +83,53 @@ export type AggregationCursor<T> = mongo.AggregationCursor<T>;
  * insertOne document into a collection.
  */
 export const insertOne =
-    (c: Collection, doc: object, opts: object = {}): Future<InsertOneResult> =>
-        fromCallback<InsertOneResult>(cb => c.insertOne(doc, opts, cb));
+    (col: Collection, doc: object, opts: object = {}): Future<InsertOneResult> =>
+        fromCallback<InsertOneResult>(cb => col.insertOne(doc, opts, cb));
 
 /**
  * insertMany documents into a collection.
  */
 export const insertMany =
-    (c: Collection, docs: object[], opts: object = {}): Future<InsertResult> =>
-        fromCallback<InsertResult>(cb => c.insertMany(docs, opts, cb));
+    (col: Collection, docs: object[], opts: object = {}): Future<InsertManyResult> =>
+        liftP(() => col.insertMany(docs, opts));
 
 /**
  * findOne document in a collection.
  */
-export const findOne = <T>(c: Collection, qry: object, opts: object = {})
+export const findOne = <T>(col: Collection, qry: object, opts: object = {})
     : Future<Maybe<T>> =>
-    fromCallback<T | null>(cb => c.findOne(qry, opts, cb))
+    fromCallback<T | null>(cb => col.findOne(qry, opts, cb))
         .map(r => fromNullable<T>(<T>r));
 
 /**
  * find documents in a collection.
  */
-export const find = <T>(c: Collection, qry: object, opts: object = {})
+export const find = <T>(col: Collection, qry: object, opts: object = {})
     : Future<T[]> =>
-    fromCallback<T[]>(cb => c.find(qry, opts).toArray(cb))
+    liftP(() => col.find<T>(qry, opts).toArray());
 
 /**
  * findOneAndUpdate a document in a collection.
  */
 export const findOneAndUpdate = <T>(
-    c: Collection,
+    col: Collection,
     filter: object,
     update: object,
-    opts: object = {}): Future<Maybe<T>> =>
-    fromCallback<mongo.FindAndModifyWriteOpResultObject<T>>(cb =>
-        c.findOneAndUpdate(filter, update, opts, cb))
-        .map(r => r.ok ? fromNullable<T>(r.value) : nothing());
+    opts: object = {}): Future<Maybe<T>> => doFuture(function*() {
+
+        let result = yield liftP(() =>
+            col.findOneAndUpdate(filter, update, opts));
+
+        return pure(result.ok ? fromNullable<T>(result.value) : nothing());
+
+    });
 
 /**
  * count the number of documents in a collection that match a query.
  */
 export const count =
-    (c: mongo.Collection, qry: object, opts: object = {}): Future<Count> =>
-        fromCallback<number>(cb => c.countDocuments(qry, opts, cb));
+    (col: mongo.Collection, qry: object, opts: object = {}): Future<Count> =>
+        fromCallback<number>(cb => col.countDocuments(qry, opts, cb));
 
 /**
  * updateOne document in a collection.
@@ -130,11 +138,11 @@ export const count =
  * documents.
  */
 export const updateOne = (
-    c: Collection,
+    col: Collection,
     qry: object,
     updateSpec: object,
     opts: object = {}): Future<UpdateResult> =>
-    fromCallback<UpdateResult>(cb => c.updateOne(qry, updateSpec, opts, cb));
+    fromCallback<UpdateResult>(cb => col.updateOne(qry, updateSpec, opts, cb));
 
 /**
  * updateMany documents in a collection.
@@ -143,43 +151,43 @@ export const updateOne = (
  * documents.
  */
 export const updateMany = (
-    c: Collection,
+    col: Collection,
     qry: object,
     updateSpec: object,
     opts: object = {}): Future<UpdateResult> =>
-    fromCallback<UpdateResult>(cb => c.updateMany(qry, updateSpec, opts, cb));
+    <Future<UpdateResult>>liftP(() => col.updateMany(qry, updateSpec, opts));
 
 /**
  * deleteOne document in a collection.
  */
 export const deleteOne = (
-    c: mongo.Collection,
+    col: mongo.Collection,
     qry: object,
     opts: object = {}): Future<DeleteResult> =>
-    fromCallback<DeleteResult>(cb => c.deleteOne(qry, opts, cb));
+    fromCallback<DeleteResult>(cb => col.deleteOne(qry, opts, cb));
 
 /**
  * deleteMany documents in a collection.
  */
 export const deleteMany = (
-    c: mongo.Collection,
+    col: mongo.Collection,
     qry: object,
     opts: object = {}): Future<DeleteResult> =>
-    fromCallback<DeleteResult>(cb => c.deleteMany(qry, opts, cb));
+    fromCallback<DeleteResult>(cb => col.deleteMany(qry, opts, cb));
 
 /**
  * aggregate applies an aggregation pipeline to a collection
  */
 export const aggregate = <T>(
-    c: Collection,
+    col: Collection,
     p: object[],
     opts: object = {}): Future<T[]> => doFuture(function*() {
 
-        let cursor = yield fromCallback(cb => c.aggregate(p, opts, cb));
+        let cursor = col.aggregate(p, opts);
 
-        let data = yield fromCallback<T[]>(cb => cursor.toArray(cb));
+        let data = yield liftP(() => cursor.toArray());
 
-        yield fromCallback<ACR>(cb => cursor.close(cb));
+        cursor.close();
 
         return pure(data);
 
@@ -194,7 +202,7 @@ export const aggregate = <T>(
  */
 export const populate =
     <T extends Object>(
-        c: mongo.Collection,
+        col: mongo.Collection,
         ref: LinkRef,
         mData: Maybe<T>,
         fields: object): Future<Maybe<T>> => {
@@ -208,7 +216,7 @@ export const populate =
 
         if (Array.isArray(data[ref[0]])) {
 
-            return find(c, { [ref[1]]: { $in: data[ref[0]] } },
+            return find(col, { [ref[1]]: { $in: data[ref[0]] } },
                 { projection: fields })
                 .chain(mr => {
 
@@ -223,8 +231,8 @@ export const populate =
 
         } else {
 
-            return findOne(c, { [ref[1]]: data[ref[0]] }, 
-              { projection: fields })
+            return findOne(col, { [ref[1]]: data[ref[0]] },
+                { projection: fields })
                 .chain(mr => {
 
                     if (mr.isJust())
@@ -247,7 +255,7 @@ export const populate =
  * of 100 by default. 
  */
 export const populateN = <T extends Object>(
-    c: mongo.Collection,
+    col: mongo.Collection,
     refs: LinkRef,
     data: T[],
     fields: object,
@@ -257,11 +265,11 @@ export const populateN = <T extends Object>(
 
         let work =
             data.map(r =>
-                populate(c, refs, just(r), fields)
+                populate(col, refs, just(r), fields)
                     .map(m => m.get()));
 
         return batch(distribute(work, n))
-            .map(r => r.reduce((p, c) => p.concat(c), []));
+            .map(r => r.reduce((p, col) => p.concat(col), []));
 
     } else {
 
@@ -276,7 +284,7 @@ export const populateN = <T extends Object>(
  * version > 2.6
  */
 export const createIndexes = (
-    c: mongo.Collection,
-    specs: mongo.IndexSpecification[],
+    col: mongo.Collection,
+    specs: mongo.IndexDescription[],
     opts: object = {}) => fromCallback<object>(cb =>
-        c.createIndexes(specs, opts, cb));
+        col.createIndexes(specs, opts, cb));
