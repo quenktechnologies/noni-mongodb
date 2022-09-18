@@ -16,6 +16,7 @@ import {
     just,
     fromNullable
 } from '@quenk/noni/lib/data/maybe';
+import { Type } from '@quenk/noni/lib/data/type';
 
 export { Maybe }
 
@@ -105,8 +106,7 @@ export const findOne = <T>(col: Collection, qry: object, opts: object = {})
  * find documents in a collection.
  */
 export const find = <T>(col: Collection, qry: object, opts: object = {})
-    : Future<T[]> =>
-    liftP(() => col.find<T>(qry, opts).toArray());
+    : Future<T[]> => <Future<T[]>>liftP(() => col.find<Type>(qry, opts).toArray());
 
 /**
  * findOneAndUpdate a document in a collection.
