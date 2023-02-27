@@ -9,4 +9,4 @@ jobs:
     uses: quenktechnologies/.github/.github/workflows/node-publish.yml@master
     secrets: inherit
     with:
-      setup: "apt-get install -y mongodb"
+      setup: "sudo apt-get install -y mongodb"
