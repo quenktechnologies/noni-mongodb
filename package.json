@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@quenk/test": "^2.2.4",
-    "@types/mocha": "^8.0.4",
+    "@types/mocha": "^10.0.1",
     "@types/mongodb": "^4.0.7",
     "mocha": "^8.2.1",
     "ts-node": "^9.0.0",
