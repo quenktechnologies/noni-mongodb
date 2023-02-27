@@ -1,6 +1,6 @@
 import * as mongo from 'mongodb';
 
-import { Future, fromCallback, liftP } from '@quenk/noni/lib/control/monad/future';
+import { Future,  liftP } from '@quenk/noni/lib/control/monad/future';
 
 /**
  * Database is an alias for Db.
@@ -17,14 +17,14 @@ export const drop = (db: Database): Future<boolean> =>
  * dropColllection from the database reference supplied.
  */
 export const dropCollection = (db: Database, name: string): Future<boolean> =>
-    fromCallback(cb => db.dropCollection(name, cb));
+    liftP(() => db.dropCollection(name));
 
 /**
  * collections provides a list of collection instances for each collection in
  * the database.
  */
 export const collections = (db: Database): Future<mongo.Collection[]> =>
-    fromCallback(cb => db.collections(cb));
+    liftP(() => db.collections());
 
 /**
  * createIndex can be used to create an indexes on a collection.

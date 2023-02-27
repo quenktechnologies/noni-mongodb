@@ -10,7 +10,7 @@
   ],
   "dependencies": {
     "@quenk/noni": "^1.43.5",
-    "mongodb": "^4.4.1"
+    "mongodb": "^5.1.0"
   },
   "devDependencies": {
     "@quenk/test": "^2.2.4",

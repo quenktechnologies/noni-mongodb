@@ -1,7 +1,7 @@
 import * as mongo from 'mongodb';
 import {
     Future,
-    fromCallback,
+    liftP
 } from '@quenk/noni/lib/control/monad/future';
 
 /**
@@ -18,10 +18,10 @@ export type Options = mongo.MongoClientOptions;
  * connect to a MongoDB database using the driver as client.
  */
 export const connect = (url: string, opts: Options = {}): Future<Client> =>
-    fromCallback(cb => mongo.MongoClient.connect(url, opts, cb));
+    liftP(() => mongo.MongoClient.connect(url, opts));
 
 /**
  * disconnect a client from its MongoDB database.
  */
 export const disconnect = (c: Client): Future<void> =>
-    fromCallback(cb => c.close(false, cb));
+    liftP(() => c.close(false));

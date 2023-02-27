@@ -3,7 +3,6 @@ import * as mongo from 'mongodb';
 import {
     Future,
     pure,
-    fromCallback,
     batch,
     doFuture,
     liftP
@@ -85,7 +84,7 @@ export type AggregationCursor<T> = mongo.AggregationCursor<T>;
  */
 export const insertOne =
     (col: Collection, doc: object, opts: object = {}): Future<InsertOneResult> =>
-        fromCallback<InsertOneResult>(cb => col.insertOne(doc, opts, cb));
+        liftP<InsertOneResult>(() => col.insertOne(doc, opts));
 
 /**
  * insertMany documents into a collection.
@@ -97,9 +96,9 @@ export const insertMany =
 /**
  * findOne document in a collection.
  */
-export const findOne = <T>(col: Collection, qry: object, opts: object = {})
+export const findOne = <T extends object>(col: Collection, qry: object, opts: object = {})
     : Future<Maybe<T>> =>
-    fromCallback<T | null>(cb => col.findOne(qry, opts, cb))
+    liftP(() => col.findOne(qry, opts))
         .map(r => fromNullable<T>(<T>r));
 
 /**
@@ -129,7 +128,7 @@ export const findOneAndUpdate = <T>(
  */
 export const count =
     (col: mongo.Collection, qry: object, opts: object = {}): Future<Count> =>
-        fromCallback<number>(cb => col.countDocuments(qry, opts, cb));
+        liftP<number>(() => col.countDocuments(qry, opts));
 
 /**
  * updateOne document in a collection.
@@ -142,7 +141,7 @@ export const updateOne = (
     qry: object,
     updateSpec: object,
     opts: object = {}): Future<UpdateResult> =>
-    fromCallback<UpdateResult>(cb => col.updateOne(qry, updateSpec, opts, cb));
+    liftP<UpdateResult>(() => col.updateOne(qry, updateSpec, opts));
 
 /**
  * updateMany documents in a collection.
@@ -164,7 +163,7 @@ export const deleteOne = (
     col: mongo.Collection,
     qry: object,
     opts: object = {}): Future<DeleteResult> =>
-    fromCallback<DeleteResult>(cb => col.deleteOne(qry, opts, cb));
+    liftP<DeleteResult>(() => col.deleteOne(qry, opts));
 
 /**
  * deleteMany documents in a collection.
@@ -173,7 +172,7 @@ export const deleteMany = (
     col: mongo.Collection,
     qry: object,
     opts: object = {}): Future<DeleteResult> =>
-    fromCallback<DeleteResult>(cb => col.deleteMany(qry, opts, cb));
+    liftP<DeleteResult>(() => col.deleteMany(qry, opts));
 
 /**
  * aggregate applies an aggregation pipeline to a collection
@@ -286,5 +285,5 @@ export const populateN = <T extends Object>(
 export const createIndexes = (
     col: mongo.Collection,
     specs: mongo.IndexDescription[],
-    opts: object = {}) => fromCallback<object>(cb =>
-        col.createIndexes(specs, opts, cb));
+    opts: object = {}) => liftP<object>(() =>
+        col.createIndexes(specs, opts));
