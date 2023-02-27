@@ -1,0 +1,14 @@
+name: Release
+on:
+  push:
+    tags: 
+      - '*'
+
+jobs:
+  release:
+   runs-on: ubuntu-latest
+    steps:
+      - run: apt-get install mongodb -y
+      - name: build
+        uses: quenktechnologies/.github/.github/workflows/node-publish.yml@master
+        secrets: inherit
