@@ -9,4 +9,4 @@ jobs:
     uses: quenktechnologies/.github/.github/workflows/node-build.yml@master
     secrets: inherit
     with:
-      setup: "wget -q0- https://gist.githubusercontent.com/metasansana/36c816cb3435345d764fafac4805983c/raw/8d73243eb91977cd370af7c8badb65df8f8a1bfd/install_mongodb.sh | bash"
+      setup: "wget -qO- https://gist.githubusercontent.com/metasansana/36c816cb3435345d764fafac4805983c/raw/8d73243eb91977cd370af7c8badb65df8f8a1bfd/install_mongodb.sh | bash"
