@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MongoDB driver API wrapped in @quenk/noni types.",
   "scripts": {
-    "test": "true || ./node_modules/.bin/mocha $(find -name *_test.ts)"
+    "test": "./node_modules/.bin/mocha $(find -name *_test.ts)"
   },
   "files": [
     "lib"
