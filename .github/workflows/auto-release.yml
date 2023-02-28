@@ -9,4 +9,4 @@ jobs:
     uses: quenktechnologies/.github/.github/workflows/node-publish.yml@master
     secrets: inherit
     with:
-      setup: "wget -qO- https://gist.githubusercontent.com/metasansana/36c816cb3435345d764fafac4805983c/raw/7347d508dcd5a1ba57cd275d15ef84c8e642f00e/install_mongodb.sh | bash"
+      setup: "wget -qO- https://gist.githubusercontent.com/metasansana/36c816cb3435345d764fafac4805983c/raw/5a09b5a375155584a1db72f7adadb115f6227a85/install_mongodb.sh | bash"
